@@ -542,25 +542,8 @@ SQL;
         $this->checkReferent($referent);
 
         $query = $this->queryCountByMonth($referent);
-
         if ($filter) {
-            if ($filter->getCommittee()) {
-                $query->andWhere('event.committee = :committee')
-                    ->setParameter('committee', $filter->getCommittee())
-                ;
-            }
-
-            if ($filter->getCityName()) {
-                $query->andWhere('event.postAddress.cityName = :city')
-                    ->setParameter('city', $filter->getCityName())
-                ;
-            }
-
-            if ($filter->getCountryCode()) {
-                $query->andWhere('event.postAddress.country = :country')
-                    ->setParameter('country', $filter->getCountryCode())
-                ;
-            }
+            $query = $this->addStatstFilter($filter, $query);
         }
 
         $result = $query

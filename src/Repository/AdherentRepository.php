@@ -13,8 +13,9 @@ use AppBundle\Entity\Committee;
 use AppBundle\Entity\CommitteeMembership;
 use AppBundle\Geocoder\Coordinates;
 use AppBundle\Membership\AdherentEmailSubscription;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use AppBundle\Statistics\StatisticsParametersFilter;
 use Cake\Chronos\Chronos;
+use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Ramsey\Uuid\Uuid;
@@ -588,6 +589,31 @@ class AdherentRepository extends ServiceEntityRepository implements UserLoaderIn
         ;
 
         return $this->formatCount($result);
+    }
+
+    public function countCommitteeMembersInReferentManagedArea(Adherent $referent, StatisticsParametersFilter $filter = null, int $months = 5): array
+    {
+        $this->checkReferent($referent);
+
+        $query = $this->createQueryBuilder('adherent', 'adherent.gender')
+            ->select('COUNT(DISTINCT adherent.id) AS count, YEAR_MONTH(event.beginAt) as yearmonth')
+            ->join('adherent.memberships', 'membership')
+            ->join('membership.committee', 'committee')
+            ->innerJoin('committee.referentTags', 'tag')
+            ->where('tag IN (:tags)')
+            ->andWhere('committee.status = :status')
+            ->andWhere('membership.joinedAt >= :from')
+            ->andWhere('membership.joinedAt <= :until')
+            ->setParameter('tags', $referent->getManagedArea()->getTags())
+            ->setParameter('status', Committee::APPROVED)
+            ->setParameter('until', (new Chronos('now'))->setTime(23, 59, 59, 999))
+            ->setParameter('from', (new Chronos("first day of -$months months"))->setTime(0, 0, 0, 000))
+            ->groupBy('yearmonth')
+        ;
+
+        $query = $this->addStatstFilter($filter, $query);
+
+        return $this->aggregateCountByMonth($query->getQuery()->getArrayResult(), 'committee_members');
     }
 
     private function formatCount(array $count): array
