@@ -12,9 +12,8 @@ class MaxFiscalYearDonationValidator extends ConstraintValidator
 {
     private $transactionRepository;
 
-    public function __construct(
-        TransactionRepository $transactionRepository
-    ) {
+    public function __construct(TransactionRepository $transactionRepository)
+    {
         $this->transactionRepository = $transactionRepository;
     }
 
@@ -37,16 +36,16 @@ class MaxFiscalYearDonationValidator extends ConstraintValidator
             return;
         }
 
-        $totalCurrentAmount = $this->transactionRepository->getTotalAmountCurrentYearByEmail($email);
+        $totalCurrentAmountInCents = $this->transactionRepository->getTotalAmountInCentsByYearAndEmail($email);
         $amountInCents = (int) $value * 100;
-        $maxDonationRemainingPossible = $constraint->maxDonation - $totalCurrentAmount;
+        $maxDonationRemainingPossible = $constraint->maxDonationInCents - $totalCurrentAmountInCents;
 
-        if ($maxDonationRemainingPossible - $amountInCents < 0) {
+        if ($maxDonationRemainingPossible < $amountInCents) {
             $this->context
                 ->buildViolation($constraint->message)
                 ->setParameters([
-                    '{{ total_current_amount }}' => $totalCurrentAmount / 100,
-                    '{{ max_amount_per_fiscal_year }}' => $constraint->maxDonation / 100,
+                    '{{ total_current_amount }}' => $totalCurrentAmountInCents / 100,
+                    '{{ max_amount_per_fiscal_year }}' => $constraint->maxDonationInCents / 100,
                     '{{ max_donation_remaining_possible }}' => $maxDonationRemainingPossible / 100,
                 ])
                 ->addViolation()

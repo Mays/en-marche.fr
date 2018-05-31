@@ -11,5 +11,5 @@ use Symfony\Component\Validator\Constraint;
 class MaxFiscalYearDonation extends Constraint
 {
     public $message = 'donation.max_fiscal_year_donation';
-    public $maxDonation = 750000; // Amount in cents
+    public $maxDonationInCents = 750000; // Amount in cents
 }

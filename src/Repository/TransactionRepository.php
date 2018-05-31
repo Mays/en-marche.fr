@@ -48,17 +48,23 @@ class TransactionRepository extends ServiceEntityRepository
     /**
      * Total amount in cents
      */
-    public function getTotalAmountCurrentYearByEmail(string $email): int
+    public function getTotalAmountInCentsByYearAndEmail(string $email, string $year = null): int
     {
+        if (!$year) {
+            $year = date('Y');
+        }
+
         return (int) $this->createQueryBuilder('transaction')
             ->innerJoin('transaction.donation', 'donation')
             ->select('SUM(donation.amount)')
             ->where('donation.emailAddress = :email')
             ->andWhere('transaction.payboxResultCode = :success_code')
-            ->andWhere('YEAR(transaction.payboxDateTime) = YEAR(NOW())')
+            ->andWhere('transaction.payboxDateTime BETWEEN :first_day_of_year AND :last_day_of_year')
             ->setParameters([
                 'email' => $email,
                 'success_code' => Transaction::PAYBOX_SUCCESS,
+                'first_day_of_year' => \DateTime::createFromFormat('Y/m/d H:i:s', "$year/1/1 00:00:00"),
+                'last_day_of_year' => \DateTime::createFromFormat('Y/m/d H:i:s', "$year/12/31 23:59:59"),
             ])
             ->getQuery()
             ->getSingleScalarResult()
