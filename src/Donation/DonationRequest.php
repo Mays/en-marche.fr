@@ -26,7 +26,6 @@ class DonationRequest
     /**
      * @Assert\NotBlank(message="donation.amount.not_blank")
      * @Assert\GreaterThan(value=0, message="donation.amount.greater_than_0")
-     * @Assert\LessThanOrEqual(value=7500, message="donation.amount.less_than_7500")
      * @MaxFiscalYearDonation
      */
     private $amount;

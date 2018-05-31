@@ -4,6 +4,7 @@ namespace Tests\AppBundle\Repository;
 
 use AppBundle\DataFixtures\ORM\LoadDonationData;
 use AppBundle\Repository\TransactionRepository;
+use Cake\Chronos\Chronos;
 use Tests\AppBundle\MysqlWebTestCase;
 use Tests\AppBundle\TestHelperTrait;
 
@@ -18,7 +19,9 @@ class TransactionRepositoryTest extends MysqlWebTestCase
 
     public function testGetTotalAmountCurrentYearByEmail(): void
     {
-        static::assertSame(25000, $this->transactionRepository->getTotalAmountInCentsByYearAndEmail('jacques.picard@en-marche.fr'));
+        Chronos::setTestNow(Chronos::createFromFormat('Y/m/d H:i:s', '2018/06/15 15:16:17'));
+
+        static::assertSame(25000, $this->transactionRepository->getTotalAmountInCentsByEmail('jacques.picard@en-marche.fr'));
     }
 
     protected function setUp()

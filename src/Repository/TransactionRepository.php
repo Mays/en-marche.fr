@@ -3,6 +3,7 @@
 namespace AppBundle\Repository;
 
 use AppBundle\Entity\Transaction;
+use Cake\Chronos\Chronos;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Symfony\Bridge\Doctrine\RegistryInterface;
 
@@ -48,9 +49,9 @@ class TransactionRepository extends ServiceEntityRepository
     /**
      * Total amount in cents
      */
-    public function getTotalAmountInCentsByYearAndEmail(string $email): int
+    public function getTotalAmountInCentsByEmail(string $email): int
     {
-        $year = date('Y');
+        $now = new Chronos();
 
         return (int) $this->createQueryBuilder('transaction')
             ->innerJoin('transaction.donation', 'donation')
@@ -61,8 +62,8 @@ class TransactionRepository extends ServiceEntityRepository
             ->setParameters([
                 'email' => $email,
                 'success_code' => Transaction::PAYBOX_SUCCESS,
-                'first_day_of_year' => \DateTime::createFromFormat('Y/m/d H:i:s', "$year/01/01 00:00:00"),
-                'last_day_of_year' => \DateTime::createFromFormat('Y/m/d H:i:s', "$year/12/31 23:59:59"),
+                'first_day_of_year' => $now->format('Y/01/01 00:00:00'),
+                'last_day_of_year' => $now->format('Y/12/31 23:59:59'),
             ])
             ->getQuery()
             ->getSingleScalarResult()

@@ -36,7 +36,7 @@ class MaxFiscalYearDonationValidator extends ConstraintValidator
             return;
         }
 
-        $totalCurrentAmountInCents = $this->transactionRepository->getTotalAmountInCentsByYearAndEmail($email);
+        $totalCurrentAmountInCents = $this->transactionRepository->getTotalAmountInCentsByEmail($email);
         $amountInCents = (int) $value * 100;
         $maxDonationRemainingPossible = $constraint->maxDonationInCents - $totalCurrentAmountInCents;
 

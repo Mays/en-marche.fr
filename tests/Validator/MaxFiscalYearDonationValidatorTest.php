@@ -148,7 +148,7 @@ class MaxFiscalYearDonationValidatorTest extends ConstraintValidatorTestCase
         $transactionRepository = $this->createMock(TransactionRepository::class);
 
         $transactionRepository->expects($this->never())
-            ->method('getTotalAmountInCentsByYearAndEmail')
+            ->method('getTotalAmountInCentsByEmail')
         ;
 
         return new MaxFiscalYearDonationValidator(
@@ -161,7 +161,7 @@ class MaxFiscalYearDonationValidatorTest extends ConstraintValidatorTestCase
         $transactionRepository = $this->createMock(TransactionRepository::class);
 
         $transactionRepository->expects($this->once())
-            ->method('getTotalAmountInCentsByYearAndEmail')
+            ->method('getTotalAmountInCentsByEmail')
             ->willReturn($totalCurrentAmount)
         ;
 
