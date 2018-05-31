@@ -1,0 +1,9 @@
+{% extends 'SonataAdminBundle:CRUD:base_list_field.html.twig' %}
+
+{% block field %}
+    <div style="text-align: center;">
+        {% if object.youtubeThumbnailUrl %}
+            <img src="{{ object.youtubeThumbnailUrl }}" style="max-height: 50px; max-width: 100px;" />
+        {% endif %}
+    </div>
+{% endblock %}
