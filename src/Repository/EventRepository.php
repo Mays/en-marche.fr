@@ -515,6 +515,26 @@ SQL;
         ;
     }
 
+    public function countParticipantsInReferentManagedArea(Adherent $referent): int
+    {
+        $this->checkReferent($referent);
+
+        $results = $this->createQueryBuilder('event')
+            ->select('event.participantsCount')
+            ->innerJoin('event.referentTags', 'tag')
+            ->where('tag IN (:tags)')
+            ->andWhere('event.committee IS NOT NULL')
+            ->andWhere("event.status = '".Event::STATUS_SCHEDULED."'")
+            ->andWhere('event.participantsCount > 0')
+            ->groupBy('event.id')
+            ->setParameter('tags', $referent->getManagedArea()->getTags())
+            ->getQuery()
+            ->getArrayResult()
+        ;
+
+        return array_sum(array_column($results, 'participantsCount'));
+    }
+
     public function countCommitteeEventsInReferentManagedArea(Adherent $referent, StatisticsParametersFilter $filter = null): array
     {
         $this->checkReferent($referent);
