@@ -18,7 +18,7 @@ class TransactionRepositoryTest extends MysqlWebTestCase
 
     public function testGetTotalAmountCurrentYearByEmail(): void
     {
-        static::assertSame(25000, $this->transactionRepository->getTotalAmountInCentsByYearAndEmail('jacques.picard@en-marche.fr', '2018'));
+        static::assertSame(25000, $this->transactionRepository->getTotalAmountInCentsByYearAndEmail('jacques.picard@en-marche.fr'));
     }
 
     protected function setUp()
