@@ -183,7 +183,7 @@ deps: vendor web/built                                                          
 
 build:
 	$(DOCKER_COMPOSE) pull --parallel --ignore-pull-failures
-	$(DOCKER_COMPOSE) build --force-rm
+	$(DOCKER_COMPOSE) build --force-rm --pull
 
 up:
 	$(DOCKER_COMPOSE) up -d --remove-orphans

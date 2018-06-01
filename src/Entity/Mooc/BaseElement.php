@@ -16,6 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @ORM\DiscriminatorColumn(name="type", type="string")
  * @ORM\DiscriminatorMap({
  *     "video" = "AppBundle\Entity\Mooc\Video",
+ *     "quizz" = "AppBundle\Entity\Mooc\Quizz",
  * })
  *
  * @Algolia\Index(autoIndex=false)

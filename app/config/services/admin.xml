@@ -585,6 +585,14 @@
             <argument />
         </service>
 
+        <service id="app.admin.mooc_quizz" class="AppBundle\Admin\MoocQuizzAdmin">
+            <tag name="sonata.admin" manager-type="orm" label="Quizzs" group="Mooc" />
+
+            <argument />
+            <argument>AppBundle\Entity\Mooc\Quizz</argument>
+            <argument />
+        </service>
+
         <!--
         ######################################################
         # OAuth
