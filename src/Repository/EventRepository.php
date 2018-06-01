@@ -515,6 +515,31 @@ SQL;
         ;
     }
 
+    public function countParticipantsInReferentManagedAreaByMonthForTheLastSixMonths(Adherent $referent): array
+    {
+        $this->checkReferent($referent);
+
+        $eventsCount = $this->createQueryBuilder('event')
+            ->select('YEAR_MONTH(event.beginAt) AS yearmonth, event.participantsCount as count')
+            ->innerJoin('event.referentTags', 'tag')
+            ->where('tag IN (:tags)')
+            ->andWhere('event.committee IS NOT NULL')
+            ->andWhere("event.status = '".Event::STATUS_SCHEDULED."'")
+            ->andWhere('event.participantsCount > 0')
+            ->andWhere('event.beginAt >= :from')
+            ->andWhere('event.beginAt <= :until')
+            ->setParameter('from', (new Chronos('first day of -5 months'))->setTime(0, 0, 0, 000))
+            ->setParameter('until', (new Chronos('now'))->setTime(23, 59, 59, 999))
+            ->setParameter('tags', $referent->getManagedArea()->getTags())
+            ->groupBy('event.id, yearmonth')
+            ->getQuery()
+            ->useResultCache(true, 3600)
+            ->getArrayResult()
+        ;
+
+        return $this->aggregateCountByMonth($eventsCount, 'total_participants');
+    }
+
     public function countParticipantsInReferentManagedArea(Adherent $referent): int
     {
         $this->checkReferent($referent);
@@ -584,9 +609,10 @@ SQL;
         foreach (range(0, $months - 1) as $month) {
             $until = (new Chronos("first day of -$month month"));
             $countByMonth[$until->format('Y-m')][$type] = 0;
+
             foreach ($eventsCount as $count) {
                 if ($until->format('Ym') === $count['yearmonth']) {
-                    $countByMonth[$until->format('Y-m')][$type] = (int) $count['count'];
+                    $countByMonth[$until->format('Y-m')][$type] += $count['count'];
                 }
             }
         }
